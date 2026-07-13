@@ -48,7 +48,7 @@ body {
     background-image: url("https://res.cloudinary.com/dbpmxkrgz/image/upload/v1684662792/Sanaa%27s%20World/sea_3_qzhkkf.png");
     background-repeat: repeat;
     background-size: cover;
-    opacity: 0.65; /* Adjust the opacity as desired */
+    opacity: 0.65; 
   }
   
   
@@ -93,16 +93,16 @@ body {
     background-attachment: fixed, fixed; */
   }
   
-  /* Now I'm editing the text */
+  /* Now I'm editing the text below */
   
   #sitetitle {
     margin-top: 0;
   color: #FFF9E3;
-  font-family: Garamond, serif;
-  font-size: 10.5vh;
+  font-family: 'Times New Roman', Times, serif New Roman, serif;
+  font-size: calc(16px + 9.5vh);
   font-weight: lighter;
   position: absolute;
-  bottom: -11vh;
+  bottom: -12vh;
   right: 0;
   text-size-adjust: auto;
   z-index: 9999;
