@@ -13,9 +13,10 @@ a{
 
 body {
   background-image: url("https://res.cloudinary.com/dbpmxkrgz/image/upload/v1684777402/Sanaa%27s%20World/pink_clouds_darker_tv5irt.png");
-  background-repeat: repeat;
+  background-repeat: no-repeat;
   background-size: cover;
-  background-position: center;
+  background-position: center center;
+  background-attachment: scroll;
   color: #f6eec2;
   font-family: Garamond, serif;
   position: relative;
@@ -29,7 +30,8 @@ body {
 
 .content-panel {
   display: block;
-  max-width: 80%;
+  width: min(80%, 900px);
+  max-width: calc(100% - 2rem);
   background: rgba(77, 119, 196, 0.475);
   padding: 1.2rem 1.5rem;
   margin: 2rem 1.25rem 0;
@@ -40,7 +42,7 @@ body {
 #pagetitle {
   text-align: left;
   font-family: 'Times New Roman', Times, serif;
-  font-size: calc(20px + 2.5vh);
+  font-size: clamp(1.5rem, 2vw + 1rem, 2.6rem);
   margin-top: 50px;
   margin-left: 20px;
 }
@@ -50,25 +52,26 @@ body {
   font-weight: normal;
   text-decoration: underline;
   font-family: 'Times New Roman', Times, serif;
-  font-size: calc(16px + 1.5vh);
+  font-size: clamp(1.05rem, 1.2vw + 0.8rem, 1.6rem);
   margin-top: 10px;
   margin-left: 20px;
 }
 
 #maintext {
   text-align: left;
-  max-width: 70%;
+  max-width: min(70ch, 100%);
   font-family: 'Times New Roman', Times, serif;
-  font-size: calc(10px + 1.5vh);
+  font-size: clamp(1rem, 0.8vw + 0.85rem, 1.2rem);
+  line-height: 1.5;
   margin-top: 20px;
   margin-left: 20px;
 }
 
 #link {
     text-align: left;
-    max-width: 70%;
+    max-width: min(70ch, 100%);
     font-family: 'Times New Roman', Times, serif;
-    font-size: calc(5px + 1.5vh);
+    font-size: clamp(0.95rem, 0.7vw + 0.8rem, 1.1rem);
     margin-left: 20px;
     margin-bottom: 20px;
 }
@@ -238,5 +241,51 @@ body {
   100% {
     transform: translateX(-140vw) translateY(0);
     filter: blur(2px);
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  body {
+    background-position: center top;
+  }
+
+  .page-wrap {
+    padding-bottom: 8rem;
+  }
+
+  .content-panel {
+    width: calc(100% - 1.5rem);
+    margin: 1rem auto 0;
+    padding: 1rem;
+  }
+
+  #pagetitle,
+  #subtitle,
+  #maintext,
+  #link {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  #pagetitle {
+    margin-top: 1rem;
+  }
+
+  #maintext {
+    max-width: 100%;
+  }
+
+  .interest-form {
+    right: 0.75rem;
+    left: 0.75rem;
+    bottom: 0.75rem;
+    width: auto;
+  }
+
+  .guestlist-panel {
+    top: 0.75rem;
+    right: 0.75rem;
+    left: 0.75rem;
+    width: auto;
   }
 }
