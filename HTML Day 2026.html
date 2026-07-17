@@ -61,16 +61,39 @@
     const closeButton = document.getElementById('guestlist-close');
     const guestlistList = document.getElementById('guestlist-list');
     const guestlistEndpoint = '/.netlify/functions/guestlist';
+    const localStorageKey = 'html-day-2026-guestlist';
+
+    function readLocalGuestlist() {
+      try {
+        const stored = localStorage.getItem(localStorageKey);
+        if (!stored) {
+          return [];
+        }
+        const parsed = JSON.parse(stored);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function writeLocalGuestlist(names) {
+      localStorage.setItem(localStorageKey, JSON.stringify(names));
+    }
 
     async function getStoredNames() {
       try {
         const response = await fetch(guestlistEndpoint);
         if (!response.ok) {
-          return [];
+          return readLocalGuestlist();
         }
-        return await response.json();
+        const names = await response.json();
+        const normalised = Array.isArray(names) ? names : [];
+        if (normalised.length) {
+          writeLocalGuestlist(normalised);
+        }
+        return normalised;
       } catch (error) {
-        return [];
+        return readLocalGuestlist();
       }
     }
 
@@ -83,12 +106,18 @@
         });
 
         if (!response.ok) {
-          return [];
+          throw new Error('Request failed');
         }
 
-        return await response.json();
+        const names = await response.json();
+        const normalised = Array.isArray(names) ? names : [];
+        writeLocalGuestlist(normalised);
+        return normalised;
       } catch (error) {
-        return [];
+        const existing = readLocalGuestlist();
+        const updated = existing.includes(name) ? existing : [...existing, name];
+        writeLocalGuestlist(updated);
+        return updated;
       }
     }
 
@@ -125,8 +154,9 @@
     }
 
     async function renderNames(names) {
+      const safeNames = Array.isArray(names) ? names : [];
       container.innerHTML = '';
-      names.forEach((name) => {
+      safeNames.forEach((name) => {
         const bubble = document.createElement('div');
         bubble.className = 'floating-name';
         bubble.textContent = name;
@@ -135,7 +165,7 @@
         container.appendChild(bubble);
         bubble.classList.add('active');
       });
-      renderGuestlist(names);
+      renderGuestlist(safeNames);
     }
 
     async function loadGuestlist() {

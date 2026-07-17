@@ -1,23 +1,42 @@
 const fs = require('fs');
 const path = require('path');
 
-const filePath = path.join(__dirname, '../../guestlist-data.json');
+const candidatePaths = [
+  path.join('/tmp', 'guestlist-data.json'),
+  path.join(__dirname, '../../guestlist-data.json')
+];
+
+function getGuestlistFilePath() {
+  return candidatePaths[0];
+}
 
 function readGuestlist() {
-  if (!fs.existsSync(filePath)) {
-    return [];
+  for (const filePath of candidatePaths) {
+    if (!fs.existsSync(filePath)) {
+      continue;
+    }
+
+    try {
+      const raw = fs.readFileSync(filePath, 'utf8');
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      continue;
+    }
   }
 
-  try {
-    const raw = fs.readFileSync(filePath, 'utf8');
-    return JSON.parse(raw);
-  } catch (error) {
-    return [];
-  }
+  return [];
 }
 
 function writeGuestlist(names) {
-  fs.writeFileSync(filePath, JSON.stringify(names, null, 2));
+  const filePath = getGuestlistFilePath();
+
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(names, null, 2));
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
 
 exports.handler = async function (event, context) {
