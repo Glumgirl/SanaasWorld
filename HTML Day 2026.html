@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href="https://res.cloudinary.com/dbpmxkrgz/image/upload/v1687688278/Sanaa%27s%20World/favicon_osuxbi.ico" rel="icon" type="image/x-icon" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Sanaa's World </title>
+    <link rel="stylesheet" href="HTML Day 2026.css">
+
+</head>
+
+<body>
+  <div class="page-wrap">
+    <button id="guestlist-toggle" class="guestlist-toggle" type="button" aria-expanded="false">Guestlist</button>
+
+    <div id="guestlist-panel" class="guestlist-panel" aria-hidden="true">
+      <button id="guestlist-close" class="guestlist-close" type="button" aria-label="Close guestlist">×</button>
+      <h3>Saved names</h3>
+      <ul id="guestlist-list" class="guestlist-list"></ul>
+    </div>
+
+    <div class="content-panel">
+    <h1 id="pagetitle">HTML Day 2026 - Manchester</h1>
+    <h3 id="subtitle">About the event</h3>
+    <p id="maintext"><a href="https://2026.html.energy/">HTML Day 2026</a> is an international event to celebrate the beauty and simplicity of HTML. Around the world, people gather to learn and write HTML together. For many people, myself included, HTML was the first programming language we learned, and it was to edit our tumblr, or if you're older, your MySpace or Geocities. You can do a lot with it, and that is the charm of HTML.</p>
+     <p id="maintext">This is the webpage for the Manchester edition</p>
+      <p id="maintext"> Join us as we  explore and experiment with HTML and create our own web pages~ </p>
+       <p id="maintext"> The event is open to everyone, whether or not you have any experience using HTML. If you're a beginner, we'll help you get started! Expect good company, html memes and a lot of snacks! </p>
+<p id="maintext" style = "font-weight: bold;"> Please register your interest on the right so we can get an idea of numbers</p> <p id="maintext" style = "filter: blur(1.5px);">(and to join the clouds as they float across the sky) </p>
+    <h3 id="subtitle">Event Details</h3>
+    <p id="maintext", style = "font-weight: bold; font-size: 3rem;"> 6 to 8pm, 7th August 2026. Venue TBC (Most likely Northern Quarter)</p>
+  
+
+    <h3 id="subtitle">What do I need to bring?</h3>
+    <p id="maintext">Just bring your laptop or a notebook to write HTML on, friends and your html energy!</p>
+
+    <h3 id="subtitle">Questions?</h3>
+    <p id="maintext">If you have any questions, please email <a href="mailto:sanaa@sanaas.world">Sanaa </a> at Sanaa@sanaas.world</p>
+
+    <p id="link"><a href="Home.html">Home</a></p>
+  </div>
+
+  <form id="interest-form" class="interest-form">
+    <label for="name-input">Register your interest!</label>
+    <input id="name-input" name="name" type="text" placeholder="Your name" required>
+    <button type="submit">Enter</button>
+  </form>
+
+  <div id="floating-names" class="floating-names"></div>
+
+<!-- javascript down here --> 
+
+  <script>
+    const form = document.getElementById('interest-form');
+    const input = document.getElementById('name-input');
+    const container = document.getElementById('floating-names');
+    const toggleButton = document.getElementById('guestlist-toggle');
+    const guestlistPanel = document.getElementById('guestlist-panel');
+    const closeButton = document.getElementById('guestlist-close');
+    const guestlistList = document.getElementById('guestlist-list');
+    const guestlistEndpoint = '/.netlify/functions/guestlist';
+
+    async function getStoredNames() {
+      try {
+        const response = await fetch(guestlistEndpoint);
+        if (!response.ok) {
+          return [];
+        }
+        return await response.json();
+      } catch (error) {
+        return [];
+      }
+    }
+
+    async function saveNames(name) {
+      try {
+        const response = await fetch(guestlistEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name })
+        });
+
+        if (!response.ok) {
+          return [];
+        }
+
+        return await response.json();
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function randomiseBubble(bubble) {
+      bubble.style.top = `${Math.random() * 70 + 10}%`;
+      const startOffset = `${Math.random() * 20 + 8}vw`;
+      bubble.style.setProperty('--start-offset', startOffset);
+      bubble.style.left = `calc(100% + ${startOffset})`;
+      bubble.style.setProperty('--wobble-a', `${(Math.random() * 2 - 1) * 20}px`);
+      bubble.style.setProperty('--wobble-b', `${(Math.random() * 2 - 1) * 18}px`);
+      bubble.style.setProperty('--wobble-c', `${(Math.random() * 2 - 1) * 16}px`);
+      bubble.style.setProperty('--wobble-d', `${(Math.random() * 2 - 1) * 14}px`);
+      bubble.style.animationDuration = '24s';
+      bubble.style.animationDelay = '0s';
+    }
+
+    function renderGuestlist(names) {
+      guestlistList.innerHTML = '';
+
+      if (!names.length) {
+        const emptyItem = document.createElement('li');
+        emptyItem.className = 'guestlist-empty';
+        emptyItem.textContent = 'No names yet.';
+        guestlistList.appendChild(emptyItem);
+        return;
+      }
+
+      names.forEach((name) => {
+        const item = document.createElement('li');
+        item.className = 'guestlist-item';
+        item.textContent = name;
+        guestlistList.appendChild(item);
+      });
+    }
+
+    async function renderNames(names) {
+      container.innerHTML = '';
+      names.forEach((name) => {
+        const bubble = document.createElement('div');
+        bubble.className = 'floating-name';
+        bubble.textContent = name;
+        randomiseBubble(bubble);
+        bubble.addEventListener('animationiteration', () => randomiseBubble(bubble));
+        container.appendChild(bubble);
+        bubble.classList.add('active');
+      });
+      renderGuestlist(names);
+    }
+
+    async function loadGuestlist() {
+      const names = await getStoredNames();
+      renderNames(names);
+    }
+
+    loadGuestlist();
+
+    toggleButton.addEventListener('click', () => {
+      const isOpen = guestlistPanel.classList.toggle('open');
+      toggleButton.setAttribute('aria-expanded', String(isOpen));
+      guestlistPanel.setAttribute('aria-hidden', String(!isOpen));
+    });
+
+    closeButton.addEventListener('click', () => {
+      guestlistPanel.classList.remove('open');
+      toggleButton.setAttribute('aria-expanded', 'false');
+      guestlistPanel.setAttribute('aria-hidden', 'true');
+    });
+
+    form.addEventListener('submit', async function (event) {
+      event.preventDefault();
+      const name = input.value.trim();
+      if (!name) return;
+
+      const names = await saveNames(name);
+      renderNames(names);
+
+      input.value = '';
+      input.focus();
+    });
+  </script>
+  </div>
+</body>
+</html>
