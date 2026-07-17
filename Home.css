@@ -122,7 +122,6 @@ body {
   }
 
   .skylink{
-    display: inline-block;
     color:#FFF9E3;
     font-family: Garamond, serif;
     font-size: calc(16px + 0.5vh);
