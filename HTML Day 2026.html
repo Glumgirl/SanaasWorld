@@ -13,10 +13,10 @@
 
 <body>
   <div class="page-wrap">
-    <button id="guestlist-toggle" class="guestlist-toggle" type="button" aria-expanded="false">Guestlist</button>
+    <button id="guestlist-toggle" class="guestlist-toggle" type="button" aria-expanded="false" disabled style="display: none;">Guestlist</button>
 
-    <div id="guestlist-panel" class="guestlist-panel" aria-hidden="true">
-      <button id="guestlist-close" class="guestlist-close" type="button" aria-label="Close guestlist">×</button>
+    <div id="guestlist-panel" class="guestlist-panel" aria-hidden="true" style="display: none;">
+      <button id="guestlist-close" class="guestlist-close" type="button" aria-label="Close guestlist" disabled style="display: none;">×</button>
       <h3>Saved names</h3>
       <ul id="guestlist-list" class="guestlist-list"></ul>
     </div>
@@ -42,13 +42,13 @@
     <p id="link"><a href="Home.html">Home</a></p>
   </div>
 
-  <form id="interest-form" class="interest-form">
+<form id="interest-form" class="interest-form" style="display: none;">
     <label for="name-input">Register your interest!</label>
     <input id="name-input" name="name" type="text" placeholder="Your name" required>
     <button type="submit">Enter</button>
-  </form>
+  </form> 
 
-  <div id="floating-names" class="floating-names"></div>
+  <div id="floating-names" class="floating-names" style="display: none;"></div>
 
 <!-- javascript down here --> 
 
@@ -60,144 +60,28 @@
     const guestlistPanel = document.getElementById('guestlist-panel');
     const closeButton = document.getElementById('guestlist-close');
     const guestlistList = document.getElementById('guestlist-list');
-    const guestlistEndpoint = '/.netlify/functions/guestlist';
-    const localStorageKey = 'html-day-2026-guestlist';
 
-    function readLocalGuestlist() {
-      try {
-        const stored = localStorage.getItem(localStorageKey);
-        if (!stored) {
-          return [];
-        }
-        const parsed = JSON.parse(stored);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch (error) {
-        return [];
-      }
-    }
-
-    function writeLocalGuestlist(names) {
-      localStorage.setItem(localStorageKey, JSON.stringify(names));
-    }
-
-    async function getStoredNames() {
-      try {
-        const response = await fetch(guestlistEndpoint);
-        if (!response.ok) {
-          return readLocalGuestlist();
-        }
-        const names = await response.json();
-        const normalised = Array.isArray(names) ? names : [];
-        if (normalised.length) {
-          writeLocalGuestlist(normalised);
-        }
-        return normalised;
-      } catch (error) {
-        return readLocalGuestlist();
-      }
-    }
-
-    async function saveNames(name) {
-      try {
-        const response = await fetch(guestlistEndpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name })
-        });
-
-        if (!response.ok) {
-          throw new Error('Request failed');
-        }
-
-        const names = await response.json();
-        const normalised = Array.isArray(names) ? names : [];
-        writeLocalGuestlist(normalised);
-        return normalised;
-      } catch (error) {
-        const existing = readLocalGuestlist();
-        const updated = existing.includes(name) ? existing : [...existing, name];
-        writeLocalGuestlist(updated);
-        return updated;
-      }
-    }
-
-    function randomiseBubble(bubble) {
-      bubble.style.top = `${Math.random() * 70 + 10}%`;
-      const startOffset = `${Math.random() * 20 + 8}vw`;
-      bubble.style.setProperty('--start-offset', startOffset);
-      bubble.style.left = `calc(100% + ${startOffset})`;
-      bubble.style.setProperty('--wobble-a', `${(Math.random() * 2 - 1) * 20}px`);
-      bubble.style.setProperty('--wobble-b', `${(Math.random() * 2 - 1) * 18}px`);
-      bubble.style.setProperty('--wobble-c', `${(Math.random() * 2 - 1) * 16}px`);
-      bubble.style.setProperty('--wobble-d', `${(Math.random() * 2 - 1) * 14}px`);
-      bubble.style.animationDuration = '24s';
-      bubble.style.animationDelay = '0s';
-    }
-
-    function renderGuestlist(names) {
-      guestlistList.innerHTML = '';
-
-      if (!names.length) {
-        const emptyItem = document.createElement('li');
-        emptyItem.className = 'guestlist-empty';
-        emptyItem.textContent = 'No names yet.';
-        guestlistList.appendChild(emptyItem);
-        return;
-      }
-
-      names.forEach((name) => {
-        const item = document.createElement('li');
-        item.className = 'guestlist-item';
-        item.textContent = name;
-        guestlistList.appendChild(item);
+    if (form) {
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
       });
     }
 
-    async function renderNames(names) {
-      const safeNames = Array.isArray(names) ? names : [];
+    if (toggleButton) {
+      toggleButton.disabled = true;
+    }
+
+    if (closeButton) {
+      closeButton.disabled = true;
+    }
+
+    if (container) {
       container.innerHTML = '';
-      safeNames.forEach((name) => {
-        const bubble = document.createElement('div');
-        bubble.className = 'floating-name';
-        bubble.textContent = name;
-        randomiseBubble(bubble);
-        bubble.addEventListener('animationiteration', () => randomiseBubble(bubble));
-        container.appendChild(bubble);
-        bubble.classList.add('active');
-      });
-      renderGuestlist(safeNames);
     }
 
-    async function loadGuestlist() {
-      const names = await getStoredNames();
-      renderNames(names);
+    if (guestlistList) {
+      guestlistList.innerHTML = '';
     }
-
-    loadGuestlist();
-
-    toggleButton.addEventListener('click', () => {
-      const isOpen = guestlistPanel.classList.toggle('open');
-      toggleButton.setAttribute('aria-expanded', String(isOpen));
-      guestlistPanel.setAttribute('aria-hidden', String(!isOpen));
-    });
-
-    closeButton.addEventListener('click', () => {
-      guestlistPanel.classList.remove('open');
-      toggleButton.setAttribute('aria-expanded', 'false');
-      guestlistPanel.setAttribute('aria-hidden', 'true');
-    });
-
-    form.addEventListener('submit', async function (event) {
-      event.preventDefault();
-      const name = input.value.trim();
-      if (!name) return;
-
-      const names = await saveNames(name);
-      renderNames(names);
-
-      input.value = '';
-      input.focus();
-    });
   </script>
   </div>
 </body>
